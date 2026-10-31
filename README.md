@@ -1,4 +1,4 @@
-﻿# S60 Inventory & Rewards - Web Portal & API
+# S60 Inventory & Rewards - Web Portal & API
 
 Clean, standalone web deployment package containing only:
 - Static Web Frontend (HTML, CSS, JS, Assets, Vendor icons)
