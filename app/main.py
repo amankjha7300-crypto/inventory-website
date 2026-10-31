@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 
 # Ensure backend directory is in sys.path so 'app' can always be imported
@@ -139,10 +139,17 @@ if os.path.exists(assets_path):
     app.mount("/assets", StaticFiles(directory=assets_path), name="assets")
 
 # Mount Uploads Directory for uploaded media and assets
-uploads_path = get_resource_dir("uploads")
-os.makedirs(uploads_path, exist_ok=True)
-os.makedirs(os.path.join(uploads_path, "events"), exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
+try:
+    uploads_path = get_resource_dir("uploads")
+    os.makedirs(uploads_path, exist_ok=True)
+    os.makedirs(os.path.join(uploads_path, "events"), exist_ok=True)
+except OSError:
+    uploads_path = "/tmp/uploads"
+    os.makedirs(uploads_path, exist_ok=True)
+    os.makedirs(os.path.join(uploads_path, "events"), exist_ok=True)
+
+if os.path.exists(uploads_path):
+    app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
 
 # Mount API Routers under /api/v1
 api_v1_prefix = "/api/v1"
