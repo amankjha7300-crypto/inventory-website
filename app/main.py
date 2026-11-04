@@ -37,8 +37,11 @@ def get_resource_dir(folder_name: str) -> str:
 
 from sqlalchemy import text
 
-# Initialize database schema
-Base.metadata.create_all(bind=engine)
+# Initialize database schema safely
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"[DB Schema Warning] Initial create_all notice: {e}")
 
 def ensure_schema_migrations():
     if not str(engine.url).startswith("sqlite"):

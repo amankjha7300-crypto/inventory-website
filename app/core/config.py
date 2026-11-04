@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     
     @property
     def clean_database_url(self) -> str:
-        url = self.DATABASE_URL
+        url = os.getenv("DATABASE_URL") or self.DATABASE_URL
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql://", 1)
         return url

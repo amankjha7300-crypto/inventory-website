@@ -117,7 +117,17 @@ async function handleLogin(e) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch (parseErr) {
+      if (res.status === 401) {
+        showToast('This preview URL is protected. Please use your main domain (inventory-website-iota.vercel.app)', 'error');
+      } else {
+        showToast(`Server returned status ${res.status}. Please try again.`, 'error');
+      }
+      return;
+    }
     if (res.ok && data.success) {
       authToken = data.data.access_token;
       currentAdmin = data.data.admin;
@@ -130,7 +140,7 @@ async function handleLogin(e) {
       showToast(data.detail || data.message || 'Login failed', 'error');
     }
   } catch (err) {
-    showToast('Connecting to backend... If cloud is warming up, please wait a moment.', 'error');
+    showToast('Network error: Could not reach the backend server.', 'error');
   } finally {
     if (submitBtn) {
       submitBtn.disabled = false;
@@ -169,7 +179,17 @@ async function handleSignUp(e) {
         password
       })
     });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch (parseErr) {
+      if (res.status === 401) {
+        showToast('This preview URL is protected. Please open your main site: inventory-website-iota.vercel.app', 'error');
+      } else {
+        showToast(`Server error (${res.status}). Please check database setup.`, 'error');
+      }
+      return;
+    }
     if (res.ok && data.success) {
       authToken = data.data.access_token;
       currentAdmin = data.data.admin;
@@ -182,7 +202,7 @@ async function handleSignUp(e) {
       showToast(data.detail || data.message || 'Registration failed', 'error');
     }
   } catch (err) {
-    showToast('Failed to connect to backend API', 'error');
+    showToast('Network error: Could not reach backend.', 'error');
   }
 }
 
@@ -207,7 +227,17 @@ async function handleResetPassword(e) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, new_password })
     });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch (parseErr) {
+      if (res.status === 401) {
+        showToast('This preview URL is protected. Please open your main site: inventory-website-iota.vercel.app', 'error');
+      } else {
+        showToast(`Server error (${res.status}). Please check database setup.`, 'error');
+      }
+      return;
+    }
     if (res.ok && data.success) {
       authToken = data.data.access_token;
       currentAdmin = data.data.admin;
@@ -220,7 +250,7 @@ async function handleResetPassword(e) {
       showToast(data.detail || data.message || 'Password reset failed', 'error');
     }
   } catch (err) {
-    showToast('Failed to connect to backend API', 'error');
+    showToast('Network error: Could not reach backend.', 'error');
   }
 }
 
