@@ -3,14 +3,23 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 from app.core.config import settings
 
 connect_args = {}
-if settings.clean_database_url.startswith("sqlite"):
-    connect_args = {"check_same_thread": False}
+engine_kwargs = {
+    "pool_pre_ping": True,  # verify connections before use
+}
 
-engine = create_engine(
-    settings.clean_database_url,
-    connect_args=connect_args,
-    pool_pre_ping=True
-)
+db_url = settings.clean_database_url
+
+if db_url.startswith("sqlite"):
+    # SQLite: local development only
+    connect_args = {"check_same_thread": False}
+    engine_kwargs["connect_args"] = connect_args
+else:
+    # PostgreSQL: serverless-safe connection pool settings
+    # NullPool prevents connections hanging across serverless invocations
+    from sqlalchemy.pool import NullPool
+    engine_kwargs["poolclass"] = NullPool
+
+engine = create_engine(db_url, **engine_kwargs)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

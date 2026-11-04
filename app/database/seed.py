@@ -28,6 +28,22 @@ def seed_database(force: bool = False, include_demo: bool = False):
 
     try:
         admin_exists = db.query(Admin).filter(Admin.email == settings.DEFAULT_ADMIN_EMAIL).first()
+
+        # Always ensure the primary management account exists, regardless of admin_exists
+        aman_exists = db.query(Admin).filter(Admin.email == "amankjha7300@gmail.com").first()
+        if not aman_exists:
+            aman_admin = Admin(
+                username="amankjha7300",
+                email="amankjha7300@gmail.com",
+                full_name="Aman Kumar",
+                password_hash=get_password_hash(settings.DEFAULT_ADMIN_PASSWORD),
+                role="SUPER_ADMIN",
+                is_active=True
+            )
+            db.add(aman_admin)
+            db.commit()
+            print("Added primary management account for amankjha7300@gmail.com")
+
         if not admin_exists or force:
             print("Initializing clean S60 Inventory & Rewards database...")
 
@@ -43,21 +59,6 @@ def seed_database(force: bool = False, include_demo: bool = False):
             db.add(admin)
             db.commit()
             db.refresh(admin)
-
-        # Ensure primary management coordinator account exists
-        aman_exists = db.query(Admin).filter(Admin.email == "amankjha7300@gmail.com").first()
-        if not aman_exists:
-            aman_admin = Admin(
-                username="amankjha7300",
-                email="amankjha7300@gmail.com",
-                full_name="Aman Kumar",
-                password_hash=get_password_hash(settings.DEFAULT_ADMIN_PASSWORD),
-                role="SUPER_ADMIN",
-                is_active=True
-            )
-            db.add(aman_admin)
-            db.commit()
-            print("Added primary management account for amankjha7300@gmail.com")
 
         if admin_exists and not force:
             print("Database already initialized.")
